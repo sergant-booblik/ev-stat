@@ -16,7 +16,6 @@ export function calculateCurrentLocale(): Locale {
 
   localStorage.setItem(LOCALE_STORAGE_KEY, browserLocale);
   return browserLocale as Locale;
-
 }
 
 export function setLocale(locale: string): void {
@@ -24,19 +23,25 @@ export function setLocale(locale: string): void {
   i18n.global.locale.value = calculateCurrentLocale();
 }
 
-export const pluralizationRule = (choice: number, choicesLength: number): number => {
-  if (choicesLength === 1) return 0;
+export const pluralizationRule = (count: number, formCount: number): number => {
+  if (formCount === 1) return 0;
 
-  const lastDigit = choice % 10;
-  const lastTwoDigits = choice % 100;
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
 
-  if (lastDigit === 1 && lastTwoDigits !== 11) {
+  const isSingular = lastDigit === 1 && lastTwoDigits !== 11;
+  const isFew = [2, 3, 4].includes(lastDigit) && ![12, 13, 14].includes(lastTwoDigits);
+
+
+  if (isSingular) {
     return 0;
-  } else if ([2, 3, 4].includes(lastDigit) && ![12, 13, 14].includes(lastTwoDigits)) {
-    return 1;
-  } else {
-    return 2;
   }
+
+  if (isFew) {
+    return 1;
+  }
+
+  return 2;
 };
 
 const i18n = createI18n({
